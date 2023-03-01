@@ -1,0 +1,29 @@
+name: deploy pages
+# actions file on which branch, only triggerd by this branch. See https://stackoverflow.com/questions/64565482/github-action-not-triggered-when-pushing-to-branch/64565483#64565483
+on: push
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: pages
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: .
+
+  deploy:
+    needs: upload
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
